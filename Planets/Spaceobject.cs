@@ -26,6 +26,8 @@ namespace SpaceSim
             this.objectRadius = objectRadius;
             this.rotationPeriod = rotationPeriod;
             this.color = color;
+            posX = 0;
+            posY = 0;
         }
 
         public virtual void Draw()

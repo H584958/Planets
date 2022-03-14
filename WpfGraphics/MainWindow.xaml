@@ -6,7 +6,12 @@
         xmlns:local="clr-namespace:WpfGraphics"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <Grid>
 
+    <Grid Background="Black" Name="Grid">
+        <Canvas Name ="canvasArea" Margin="0, 0, 0, 0" Grid.ColumnSpan="2">
+        </Canvas>
     </Grid>
+
 </Window>
+    
+    
