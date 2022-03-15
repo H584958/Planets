@@ -23,22 +23,21 @@ namespace WpfGraphics
     {
 
         List<SpaceObject> solarSystem = new List<SpaceObject>();
-        List<SpaceObject> solarSystemReal = new List<SpaceObject>();
 
         double days = 0;
-        double SunScale = 500;
+        double scale = 500;
         double z = 1.0;
-        double speed = 0.5;
+        double speed = 0.6;
 
         public MainWindow()
         {
             InitializeComponent();
-            getSolarSystem tempSol = new getSolarSystem();
+            SolarSystem tempSol = new SolarSystem();
             solarSystem = tempSol.getSolar();
-            solarSystemReal = tempSol.getRealSolar();
 
             makeZoomButton();
             makeSpeedButton();
+            makeLabelButton();
 
             DispatcherTimer timer = new DispatcherTimer
             {
@@ -70,14 +69,48 @@ namespace WpfGraphics
 
         }
 
+        private void makeLabelButton()
+        {
+            Button button = new Button()
+            {
+                Content = "toggle labels"
+            };
+            Canvas.SetLeft(button, 0);
+            Canvas.SetTop(button, 0);
+            button.Click += new RoutedEventHandler(toggleLabel);
+            canvasArea.Children.Add(button);
+        }
+
+        private void toggleLabel(object sender, RoutedEventArgs e)
+        {
+            if (labelCanvas.Visibility == Visibility.Collapsed)
+            {
+                labelCanvas.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                labelCanvas.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private Label makeLabel(SpaceObject obj)
+        {
+            Label label = new Label()
+            {
+                Content = obj.name,
+                Foreground = Brushes.White
+            };
+            return label;
+        }
+
         private void faster(object sender, RoutedEventArgs e)
         {
-            speed = speed + 2;
+            speed = speed + 0.5;
         }
 
         private void slower(object sender, RoutedEventArgs e)
         {
-            speed = speed - 2;
+            speed = speed - 0.5;
         }
 
         private void makeZoomButton()
@@ -151,18 +184,19 @@ namespace WpfGraphics
 
         private void spaceObjectInfo(object sender, MouseButtonEventArgs e)
         {
+            ClearCanvasInfo();
             Ellipse ellipse = (Ellipse)sender;
             int i = 0;
             SpaceObject temp = null;
             foreach (SpaceObject space in solarSystem)
             {
-                if (ellipse.Height == space.objectRadius / SunScale)
+                if (ellipse.Height == space.objectRadius / scale)
                 {
                     i = solarSystem.IndexOf(space);
                 }
             }
 
-            temp = solarSystemReal[i];
+            temp = solarSystem[i];
 
             if (temp.Parent == null)
             {
@@ -172,6 +206,7 @@ namespace WpfGraphics
                 };
                 Canvas.SetLeft(textbox, 0);
                 Canvas.SetTop(textbox, 200);
+                planetInfo.Children.Add(textbox);
             }
             else
             {
@@ -197,17 +232,18 @@ namespace WpfGraphics
                 }
                 Canvas.SetLeft(textbox, 0);
                 Canvas.SetTop(textbox, 200);
+                planetInfo.Children.Add(textbox);
             }
         }
 
-
-
-
-
-
-
         private void ClearCanvasSpaceObj()
         {
+            for (int i = labelCanvas.Children.Count - 1; i >= 0; i += -1)
+            {
+                UIElement Child = labelCanvas.Children[i];
+                if (Child is Label)
+                    labelCanvas.Children.Remove(Child);
+            }
             for (int i = canvasArea.Children.Count - 1; i >= 0; i += -1)
             {
                 UIElement Child = canvasArea.Children[i];
@@ -230,18 +266,31 @@ namespace WpfGraphics
             foreach (SpaceObject obj in solarSystem)
             {
                 obj.getPosition(days);
-                double x = obj.posX + ((canvasArea.ActualWidth - ((obj.objectRadius) / SunScale)) / 2);
-                double y = obj.posY + ((canvasArea.ActualHeight - ((obj.objectRadius) / SunScale)) / 2);
+                double x = obj.posX + ((canvasArea.ActualWidth - ((obj.objectRadius) / scale)) / 2);
+                double y = obj.posY + ((canvasArea.ActualHeight - ((obj.objectRadius) / scale)) / 2);
 
+                Label label = makeLabel(obj);
+                
                 Ellipse ellipse = makeSpaceObject(obj.objectRadius, obj.color);
 
                 ellipse.MouseLeftButtonDown += spaceObjectInfo;
 
                 Canvas.SetLeft(ellipse, x);
                 Canvas.SetTop(ellipse, y);
+                Canvas.SetLeft(label, x + 20);
+                Canvas.SetTop(label, y);
 
-
+                labelCanvas.Children.Add(label);
                 canvasArea.Children.Add(ellipse);
+            }
+        }
+        private void ClearCanvasInfo()
+        {
+            for (int i = planetInfo.Children.Count - 1; i >= 0; i += -1)
+            {
+                UIElement Child = planetInfo.Children[i];
+                if (Child is TextBox)
+                    planetInfo.Children.Remove(Child);
             }
         }
 
@@ -253,8 +302,8 @@ namespace WpfGraphics
             ellipse.Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString(color));
             ellipse.StrokeThickness = 2;
             ellipse.Stroke = Brushes.Black;
-            ellipse.Width = objectRadius / SunScale;
-            ellipse.Height = objectRadius / SunScale;
+            ellipse.Width = objectRadius / scale;
+            ellipse.Height = objectRadius / scale;
 
             return ellipse;
         }

@@ -10,7 +10,10 @@
     <Grid Background="Black" Name="Grid">
         <Canvas Name ="canvasArea" Margin="0, 0, 0, 0" Grid.ColumnSpan="2">
         </Canvas>
-    </Grid>
+        <Canvas Name="planetInfo" Margin="0,0,0,0" Grid.ColumnSpan="2"></Canvas>
+		<Canvas Name="labelCanvas" Margin="0,0,0,0" Grid.ColumnSpan="2"></Canvas>
+
+	</Grid>
 
 </Window>
     
